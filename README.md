@@ -1,4 +1,4 @@
-# Wynn Text Extraction
+# PDF Text Extraction
 
 Preliminary research and starter code for extracting text from PDF files which contain press releases, company report, shareholder report and company statements. <br>
 
