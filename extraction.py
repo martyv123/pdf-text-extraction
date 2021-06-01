@@ -1,4 +1,5 @@
 import os
+import sys
 import csv
 from io import BytesIO
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
@@ -170,7 +171,20 @@ def produce_final_extraction(text, path):
     """
     # Get the relevant text containing keywords from the document
     # This also produces the keywords
-    relevant_text = get_relevant_text(text)
+    relevant_text = get_relevant_text(text).strip()
+
+    # Record the number of paragraphs and their word counts
+    paragraphs = relevant_text.split(" | ")
+    words = ""
+    for pid, paragraph in enumerate(paragraphs):
+        if pid == 0:
+            if words:
+                words = str(len(paragraph.split()))
+            else:
+                words = ""
+        else:
+            words += ", "
+            words += str(len(paragraph.split()))
 
     # Get the source of the document
     source = get_source(text)
@@ -186,9 +200,11 @@ def produce_final_extraction(text, path):
             else:
                 keywords += ", "
                 keywords += keyword
-        final_extraction = {"relevant_text": relevant_text, "keywords": keywords, "who_wrote_the_piece": source, "subject": subject, "path": path}
+        final_extraction = {"relevant_text": relevant_text, "paragraphs": len(paragraphs), "words": words,
+                            "keywords": keywords, "who_wrote_the_piece": source, "subject": subject, "path": path}
     else:
-        final_extraction = {"relevant_text": relevant_text, "keywords": "", "who_wrote_the_piece": source, "subject": subject, "path": path}
+        final_extraction = {"relevant_text": relevant_text, "paragraphs": "", "words": words,
+                            "keywords": "", "who_wrote_the_piece": source, "subject": subject, "path": path}
 
     return final_extraction
 
@@ -196,14 +212,19 @@ def produce_final_extraction(text, path):
 if __name__ == '__main__':
     # Open directory containing the PDF files and append the file names to our list of files
     files = []
-    with os.scandir('20_examples/') as entries:
+    num = sys.argv[1]
+    if not num:
+        print("You did provide a dataset number.")
+        sys.exit(1)
+    
+    with os.scandir(num + '/') as entries:   
         for entry in entries:
             files.append(entry.name)
 
     # Recreate the spreadsheet with correct column headings
     # Date/Time, Identifier(s), Headline, Source
 
-    with open("1_new.csv", mode='w', encoding='utf-8', newline='') as new_input:
+    with open(num + "_new.csv", mode='w', encoding='utf-8', newline='') as new_input:    
         fieldnames = ["identifier", "headline", "date", "source"]
         writer = csv.DictWriter(new_input, fieldnames=fieldnames)
 
@@ -227,16 +248,19 @@ if __name__ == '__main__':
 
 
     # Go through each file and query for the requested fields
-    for file in files:
-        text = pdf_to_text("20_examples/" + file)
+    for id, file in enumerate(files):
+        text = pdf_to_text(num + "/" + file)     
         final_extraction = produce_final_extraction(text, file)
         print(final_extraction)
         print("\n")
 
         # Open our tmp file for writing/storing the queries - 
-        with open("1_tmp.csv", mode='a', encoding='utf-8', newline='') as output:
-            fieldnames = ["who_wrote_the_piece", "subject", "relevant_text", "keywords", "path"]
+        with open(num + "_tmp.csv", mode='a', encoding='utf-8', newline='') as output:      
+            fieldnames = ["who_wrote_the_piece", "subject", "relevant_text", "paragraphs", "words", "keywords", "path"]
             writer = csv.DictWriter(output, fieldnames)
+
+            if id == 0:
+                writer.writeheader()
 
             writer.writerow(final_extraction)
 
