@@ -7,7 +7,7 @@ from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfpage import PDFPage
 
-
+"""
 KEYWORDS = ["gender inequality", "gender issue", "gender justice", "gender pay gap", "gender proud", "gender gap", "gendered violence",
             "sexual harassment", "sexism", "sexual assault", "sexual crime", "sexual harassment", "sexual misconduct", "sexual violence", "sexual abuse", "sexual accusation",
             "sexually harrasing", "sexually harassed", "sexually assaulting", "sexually assaulted", "sexually abusing", "sexually abused",
@@ -16,6 +16,18 @@ KEYWORDS = ["gender inequality", "gender issue", "gender justice", "gender pay g
             "code of conduct on sexual harassment", "anti-harassment policy and complaint", "anti-discrimination and harassment policy", "Sexual Harassment Prevention Training",
             "bystander intervention", "Equal Employment Opportunity", "whistleblower complaint", "zero-tolerance diversity policy", "parental leave", "freedom from discrimination",
             "freedom from harassment", "freedom from violence", "reporting workplace harassment", "Commitment to women empowerment", "gender-sensitive language", "diversity"]
+"""
+
+KEYWORDS = ["cyber hack", "cyber breach", "infiltration of computer systems","infiltration of technology system", "infiltration of networks",
+            "consumer privacy violations", "unauthorized access of personal information", "unauthorized distribution of personal information", 
+            "violating consumer privacy", "sale of confidential client info", "release of confidential client info", "data breach",
+            "chief data officer", "Chief digital officer", "Chief Privacy Officer", "data confidentiality", "user privacy consent", "user data protection law",
+            "user data scandal", "data security protocol", "user digital privacy", "compromised digital privacy", "potential for customer vulnerability",
+            "user privacy policy", "user privacy statement ", "aggregate consumer information", "compromised user data", "Cyber Liability Insurance Policy",
+            "user data encryption", "Fair Information Practice", "passive data collection", "Data Stewardship", "Data protection directive",
+            "GDPR compliance", "GDPR implementation", "GDPR compliant", "General data protection regulation", "compliance with data-related regulations",
+            "product privacy", "2-factor privacy authentication", "Multi-factor authentication", "California Consumer Privacy Act compliance", 
+            "data-protection officers", "privacy by design", "right to privacy", "Children's Online Privacy Protection Act"]
 
 # Here we account for different variations of the keywords
 
@@ -178,7 +190,7 @@ def produce_final_extraction(text, path):
     words = ""
     for pid, paragraph in enumerate(paragraphs):
         if pid == 0:
-            if words:
+            if paragraph:
                 words = str(len(paragraph.split()))
             else:
                 words = ""
@@ -251,8 +263,8 @@ if __name__ == '__main__':
     for id, file in enumerate(files):
         text = pdf_to_text(num + "/" + file)     
         final_extraction = produce_final_extraction(text, file)
-        print(final_extraction)
-        print("\n")
+        # print(final_extraction)
+        # print("\n")
 
         # Open our tmp file for writing/storing the queries - 
         with open(num + "_tmp.csv", mode='a', encoding='utf-8', newline='') as output:      
